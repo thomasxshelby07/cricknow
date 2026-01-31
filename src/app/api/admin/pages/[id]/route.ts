@@ -4,10 +4,11 @@ import { authOptions } from "@/lib/auth";
 import connectToDatabase from "@/lib/db";
 import { Page } from "@/models/Page";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         await connectToDatabase();
-        const page = await Page.findById(params.id);
+        const page = await Page.findById(id);
         if (!page) return NextResponse.json({ error: "Page not found" }, { status: 404 });
         return NextResponse.json({ success: true, data: page });
     } catch (error: any) {
@@ -15,8 +16,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -24,25 +26,26 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         const body = await req.json();
 
         // Prevent slug change if System Page (safety check)
-        // const existing = await Page.findById(params.id);
+        // const existing = await Page.findById(id);
         // if (existing.type === 'system' && body.slug !== existing.slug) {
         //     return NextResponse.json({ error: "Cannot change slug of System Pages." }, { status: 400 });
         // }
 
-        const updatedPage = await Page.findByIdAndUpdate(params.id, body, { new: true });
+        const updatedPage = await Page.findByIdAndUpdate(id, body, { new: true });
         return NextResponse.json({ success: true, data: updatedPage });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         await connectToDatabase();
-        await Page.findByIdAndDelete(params.id);
+        await Page.findByIdAndDelete(id);
         return NextResponse.json({ success: true });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
