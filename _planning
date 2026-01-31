@@ -1,0 +1,126 @@
+# Admin Panel UX & Workflow Strategy (Locked)
+
+> **Status:** PHASE 5 - LOCKED
+> **Purpose:** To define the Admin Panel as the "SEO Operating System" of the platform.
+
+---
+
+## 1. Core Philosophy
+*   **The Brain:** The Admin Panel decides *everything*. The frontend is a passive display.
+*   **SEO OS:** It's not just for writing text; it's for managing the site's relationship with search engines.
+*   **UX Pattern:** Consistency is king. All distinct content types (Sites, Blogs, News) share the **same** editing flow.
+
+---
+
+## 2. Global Layout Structure
+A standard, professional dashboard layout.
+
+*   **Left Sidebar:** Navigation modules (Collapsible).
+*   **Top Bar:** User Profile, Role Badge (`SUPER ADMIN`), Logout, Global Search.
+*   **Main Content:** The workspace.
+
+### Sidebar Navigation Tree
+```
+Dashboard          (Overview & SEO Health)
+
+Betting Sites      (The "Money" Modules)
+  ├─ All Sites
+  ├─ Add New Site
+  └─ Reviews
+
+Blogs              (The "Traffic" Modules)
+  ├─ All Blogs
+  └─ Add New Blog
+
+News               (The "Freshness" Modules)
+  ├─ All News
+  └─ Add New Update
+
+Promotions         (The "Conversion" Modules)
+  ├─ All Offers
+  └─ Create Offer
+
+System             (Protected: SUPER_ADMIN Only)
+  ├─ Admins
+  ├─ Audit Logs
+  └─ Settings
+```
+
+---
+
+## 3. The Dashboard (Command Center)
+Not just a welcome screen. It must show **Actionable SEO Intelligence**.
+*   **Key Metrics:** Total Published Pages, Drafts, Total Sites.
+*   **SEO Health:** "3 Pages missing Meta Description", "1 Page with Duplicate Slug".
+*   **Visibility Snapshot:** "Currently Showing on Home Hero: [Betway], [Parimatch]".
+
+---
+
+## 4. The "Tabbed" Editing Experience
+**Critical Requirement:** To avoid scrolling fatigue and cognitive overload, all "Add/Edit" screens use a **6-Tab System**.
+
+### Tab 1: 📝 Basic
+*   **Focus:** The absolute minimum to create a record.
+*   **Fields:** Title/Name, Slug, Category/Type, Core Content (Rich Text).
+
+### Tab 2: 🔍 SEO (The Engine)
+*   **Focus:** Search Engine instructions.
+*   **Fields:**
+    *   Meta Title (Character counter: 0/60)
+    *   Meta Description (Character counter: 0/160)
+    *   Focus Keywords (Tags)
+    *   Canonical URL (Optional override)
+    *   Robots Toggle: `Index/No-Index`, `Follow/No-Follow`.
+
+### Tab 3: 🖼️ Media
+*   **Focus:** Visual Assets.
+*   **Fields:** Logo/Cover Image, OG Image (Social Share), Alt Text inputs.
+
+### Tab 4: 👁️ Visibility (The Controller)
+*   **Focus:** Where does this appear?
+*   **Toggles:**
+    *   `Show on Home`
+    *   `Show on Category Page`
+    *   `Is Featured?`
+    *   `Display Order` (Number input for ranking).
+
+### Tab 5: 🔗 Linking (The Spiderweb)
+*   **Focus:** Internal Link Building.
+*   **UI:** Multi-select dropdowns with search.
+    *   "Related Betting Sites"
+    *   "Related Blogs"
+    *   "Related Offers"
+
+### Tab 6: ⚙️ Status & Publish
+*   **Focus:** Safety & Lifecycle.
+*   **Fields:**
+    *   Status: `Draft` | `Published` | `Hidden` | `Archived`
+    *   Date Picker: "Publish Date" (Future scheduling possible)
+    *   **Action Buttons:** `Save Draft`, `Preview`, `Publish Live`.
+
+---
+
+## 5. UX Safety & Warnings
+The UI must actively prevent SEO suicide.
+
+1.  **Slug Protection:** If editing an existing slug, pop up a "Danger" modal warning about broken links.
+2.  **Completeness Checks:** If "Meta Description" is empty when hitting publish, show a warning toast (but allow proceed if user insists).
+3.  **Visual Cues:**
+    *   🟢 Published (Green Badge)
+    *   🟡 Draft (Yellow Badge)
+    *   🔴 No-Index (Red Tag next to title)
+
+---
+
+## 6. Role-Based UI (RBAC)
+*   **Admin View:** Clean, focused on content. "System" section is invisible. "Delete" buttons for high-value assets are disabled or hidden.
+*   **Super Admin View:** Full control, including "Hard Delete" and User Management.
+
+---
+
+## 🔒 Phase 5 Output Checklist
+*   [x] Navigation Structure Locked.
+*   [x] Dashboard utility defined (SEO Health).
+*   [x] Standardized 6-Tab Editing Flow defined.
+*   [x] Field placement mapped to Data Schema.
+*   [x] UX Safety nets established.

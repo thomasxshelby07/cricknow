@@ -1,0 +1,213 @@
+import Link from "next/link";
+import { Metadata } from "next";
+import connectToDatabase from "@/lib/db";
+import { News } from "@/models/News";
+import { BettingSite } from "@/models/BettingSite";
+import { ArrowRight, Calendar, Clock, ChevronRight, Star, Trophy, TrendingUp } from "lucide-react";
+import { format } from "date-fns";
+import { FeaturedSlider } from "@/components/public/FeaturedSlider";
+
+export const metadata: Metadata = {
+    title: "Latest Cricket News & Updates | Cricknow",
+    description: "Stay updated with the latest cricket news, match analysis, and player updates.",
+};
+
+async function getNewsData(category?: string) {
+    await connectToDatabase();
+
+    const query: any = { 'visibility.status': 'published' };
+    if (category && category !== 'All') {
+        query.category = category;
+    }
+
+    // Fetch Featured News (Array for Slider)
+    let featuredNews: any[] = [];
+    if (!category || category === 'All') {
+        featuredNews = await News.find({ ...query, isFeatured: true })
+            .sort({ priority: -1, createdAt: -1 })
+            .lean();
+    }
+
+    // Fetch Latest News (Exclude featured from main list)
+    const featuredIds = featuredNews.map(n => n._id.toString());
+    const newsQuery = { ...query };
+    if (featuredIds.length > 0) {
+        newsQuery._id = { $nin: featuredIds };
+    }
+
+    const latestNews = await News.find(newsQuery)
+        .sort({ createdAt: -1 })
+        .limit(20)
+        .lean();
+
+    return { featuredNews, latestNews };
+}
+
+async function getSidebarSites() {
+    await connectToDatabase();
+    return await BettingSite.find({
+        'visibility.status': 'published',
+        showOnNewsSidebar: true
+    })
+        .select('name slug logoUrl rating ctaText')
+        .sort({ 'visibility.displayOrder': 1 })
+        .limit(5)
+        .lean();
+}
+
+export default async function NewsPage({ searchParams }: { searchParams: { category?: string } }) {
+    const category = searchParams.category || 'All';
+    const { featuredNews, latestNews } = await getNewsData(category);
+    const sidebarSites = await getSidebarSites();
+
+    const categories = ['All', 'Cricket Betting', 'Casino News', 'Platform Updates', 'General', 'Betting News'];
+
+    return (
+        <div className="bg-white dark:bg-black min-h-screen font-sans">
+            {/* Header - Simplified Black Theme */}
+            <div className="bg-black text-white py-8 md:py-12 px-4 border-b border-gray-800">
+                <div className="container mx-auto text-center">
+                    <span className="inline-block py-1 px-3 rounded-full bg-white/10 border border-white/20 text-[10px] font-medium mb-3 uppercase tracking-widest">
+                        Cricket World
+                    </span>
+                    <h1 className="text-2xl md:text-4xl font-black mb-2 uppercase tracking-tight">
+                        Latest News & <span className="text-gray-400">Updates</span>
+                    </h1>
+                </div>
+            </div>
+
+            <div className="container mx-auto px-4 py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+                    {/* Main Content Area */}
+                    <div className="lg:col-span-8 space-y-12">
+
+                        {/* Category Filter */}
+                        <div className="flex flex-wrap gap-2 pb-4 border-b border-gray-200 dark:border-gray-800">
+                            {categories.map((cat) => (
+                                <Link
+                                    key={cat}
+                                    href={cat === 'All' ? '/news' : `/news?category=${cat}`}
+                                    className={`px-4 py-2 rounded-full text-sm font-bold transition-all uppercase tracking-wide ${category === cat
+                                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                                        : 'bg-gray-100 dark:bg-gray-900 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'
+                                        }`}
+                                >
+                                    {cat}
+                                </Link>
+                            ))}
+                        </div>
+
+                        {/* Featured News Slider */}
+                        {featuredNews.length > 0 && (category === 'All') && (
+                            <section className="mb-10">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <span className="w-2 h-8 bg-black dark:bg-white rounded-full"></span>
+                                    <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-900 dark:text-white">Featured Stories</h2>
+                                </div>
+                                <FeaturedSlider items={JSON.parse(JSON.stringify(featuredNews))} basePath="/news" />
+                            </section>
+                        )}
+
+                        {/* Latest News Grid */}
+                        <section>
+                            <div className="flex items-center gap-2 mb-6">
+                                <span className="w-2 h-8 bg-gray-300 dark:bg-gray-700 rounded-full"></span>
+                                <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-900 dark:text-white">
+                                    {category === 'All' ? 'Latest Updates' : `${category}`}
+                                </h2>
+                            </div>
+
+                            {latestNews.length > 0 ? (
+                                <div className="flex flex-col gap-8">
+                                    {latestNews.map((item: any) => (
+                                        <Link
+                                            key={item._id}
+                                            href={`/${item.slug}`}
+                                            className="group flex flex-col md:flex-row gap-6 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-900/50 p-4 rounded-2xl transition-all border border-transparent hover:border-gray-100 dark:hover:border-gray-800"
+                                        >
+                                            <div className="relative w-full md:w-64 aspect-video rounded-xl overflow-hidden shrink-0">
+                                                <img
+                                                    src={item.coverImageUrl || '/placeholder.jpg'}
+                                                    alt={item.title}
+                                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                                />
+                                                {item.category && (
+                                                    <span className="absolute top-2 left-2 bg-black/80 text-white text-[10px] font-bold px-2 py-1 rounded">
+                                                        {item.category}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col justify-center flex-1">
+                                                <div className="text-xs text-gray-400 mb-2 font-mono uppercase">
+                                                    {format(new Date(item.createdAt), 'MMM d, yyyy')}
+                                                </div>
+                                                <h3 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white mb-3 leading-snug group-hover:underline decoration-2 underline-offset-4">
+                                                    {item.title}
+                                                </h3>
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 md:line-clamp-3 mb-4 leading-relaxed">
+                                                    {item.summary}
+                                                </p>
+                                                <div className="text-sm font-bold text-black dark:text-white flex items-center group-hover:translate-x-1 transition-transform w-fit">
+                                                    Read More <ArrowRight className="w-4 h-4 ml-1" />
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-12 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+                                    <p className="text-gray-400">No news found.</p>
+                                </div>
+                            )}
+                        </section>
+
+                    </div>
+
+                    {/* Sidebar Area */}
+                    <aside className="lg:col-span-4 space-y-8">
+
+                        {/* Betting Sites Widget */}
+                        <div className="bg-gray-50 dark:bg-neutral-900 rounded-3xl p-6 md:p-8 sticky top-24">
+                            <h3 className="text-xl font-black uppercase text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
+                                <Trophy className="w-5 h-5 text-yellow-500" /> Top Picks
+                            </h3>
+
+                            <div className="space-y-4">
+                                {sidebarSites.length > 0 ? sidebarSites.map((site: any) => (
+                                    <div key={site._id} className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-black shadow-sm hover:shadow-md transition-all">
+                                        <div className="w-12 h-12 rounded-xl bg-gray-100 p-1 flex items-center justify-center shrink-0">
+                                            <img src={site.logoUrl} alt={site.name} className="w-full h-full object-contain" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-bold text-neutral-900 dark:text-white truncate">{site.name}</h4>
+                                            <div className="flex items-center gap-1 text-yellow-500 text-xs font-bold">
+                                                <Star className="w-3 h-3 fill-current" />
+                                                {site.rating}/10
+                                            </div>
+                                        </div>
+                                        <a
+                                            href={site.slug ? `/${site.slug}` : '#'}
+                                            className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-xs font-bold rounded-lg hover:opacity-80 transition-opacity whitespace-nowrap"
+                                        >
+                                            Visit
+                                        </a>
+                                    </div>
+                                )) : (
+                                    <p className="text-center text-gray-400 text-sm">No sites available.</p>
+                                )}
+                            </div>
+
+                            <Link
+                                href="/offers"
+                                className="block w-full py-4 mt-6 bg-primary text-white font-bold text-center rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+                            >
+                                Get Exclusive Offers
+                            </Link>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    );
+}
