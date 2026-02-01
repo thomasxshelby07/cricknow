@@ -48,6 +48,7 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
+                console.log('🎫 JWT Callback - Setting user data:', user.email, user.role);
                 token.id = user.id;
                 token.role = user.role;
                 token.permissions = user.permissions;
@@ -72,4 +73,16 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt",
     },
     secret: process.env.NEXTAUTH_SECRET,
+    debug: process.env.NODE_ENV === 'development',
+    cookies: {
+        sessionToken: {
+            name: `next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: process.env.NODE_ENV === 'production',
+            },
+        },
+    },
 };
