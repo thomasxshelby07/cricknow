@@ -10,6 +10,9 @@ import { SiteDetailView } from "@/components/views/SiteDetailView";
 import { BlogDetailView } from "@/components/views/BlogDetailView";
 import { NewsDetailView } from "@/components/views/NewsDetailView";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Helper to find content type
 async function getContent(slug: string) {
     await connectToDatabase();
