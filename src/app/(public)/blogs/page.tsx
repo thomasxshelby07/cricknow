@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     description: "Read expert strategies, betting guides, and in-depth articles about cricket.",
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getFeaturedBlogs() {
     await connectToDatabase();
     return await Blog.find({
@@ -28,10 +31,10 @@ async function getFeaturedBlogs() {
 async function getSidebarData() {
     await connectToDatabase();
 
-    // Fetch Trending/Recent News (Limit 3)
+    // Fetch Trending/Recent News (Limit 5)
     const trendingNews = await News.find({ 'visibility.status': 'published' })
         .sort({ createdAt: -1 })
-        .limit(3)
+        .limit(5)
         .lean();
 
     // Fetch Sidebar Sites
@@ -39,7 +42,7 @@ async function getSidebarData() {
         'visibility.status': 'published',
         showOnBlogSidebar: true
     })
-        .select('name slug logoUrl rating ctaText')
+        .select('name slug logoUrl rating ctaText mainBonusText joiningBonus')
         .sort({ 'visibility.displayOrder': 1 })
         .limit(5)
         .lean();
@@ -96,8 +99,8 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
                                     key={cat.value}
                                     href={cat.value === 'all' ? '/blogs' : `/blogs?category=${cat.value}`}
                                     className={`px-4 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-wider border ${category === cat.value
-                                            ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white shadow-md'
-                                            : 'bg-transparent text-gray-500 border-gray-200 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                                        ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white shadow-md'
+                                        : 'bg-transparent text-gray-500 border-gray-200 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
                                         }`}
                                 >
                                     {cat.label}
@@ -121,27 +124,28 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
                     <aside className="lg:col-span-4 space-y-8 mt-12 lg:mt-0">
 
                         {/* 1. Trending News Widget */}
-                        <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm sticky top-24">
-                            <h3 className="text-lg font-black uppercase text-neutral-900 dark:text-white mb-5 flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-gray-800">
-                                <TrendingUp className="w-5 h-5 text-red-500" /> Trending News
+                        <div className="bg-white dark:bg-neutral-900 rounded-lg p-6 border border-gray-100 dark:border-gray-800 shadow-sm">
+                            <h3 className="text-sm font-black uppercase text-gray-400 mb-6 tracking-widest">
+                                Trending News
                             </h3>
-                            <div className="space-y-5">
-                                {trendingNews.length > 0 ? trendingNews.map((news: any) => (
-                                    <Link key={news._id} href={`/${news.slug}`} className="group flex gap-3 items-start">
-                                        <div className="w-20 h-16 rounded-lg bg-gray-100 overflow-hidden shrink-0 relative">
-                                            {news.coverImageUrl ? (
-                                                <img src={news.coverImageUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                                            ) : (
-                                                <div className="w-full h-full bg-gray-200" />
-                                            )}
+                            <div className="space-y-6">
+                                {trendingNews.length > 0 ? trendingNews.map((news: any, index: number) => (
+                                    <Link key={news._id} href={`/${news.slug}`} className="group flex gap-4 items-start pb-6 border-b border-gray-100 dark:border-gray-800 last:border-0 last:pb-0">
+                                        <div className="text-lg font-black text-gray-200 dark:text-gray-800 leading-none mt-1 min-w-[12px]">
+                                            {index + 1}
                                         </div>
-                                        <div>
-                                            <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">
-                                                {format(new Date(news.createdAt), 'MMM d')}
+                                        {news.coverImageUrl && (
+                                            <div className="w-20 h-14 rounded-md bg-gray-100 dark:bg-gray-800 overflow-hidden shrink-0 relative shadow-sm">
+                                                <img src={news.coverImageUrl} alt={news.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out" />
                                             </div>
-                                            <h4 className="text-sm font-bold text-neutral-900 dark:text-white leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                                        )}
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-sm font-bold text-neutral-900 dark:text-white leading-snug line-clamp-2 group-hover:text-primary transition-colors mb-1.5">
                                                 {news.title}
                                             </h4>
+                                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                                                {format(new Date(news.createdAt), 'MMM d')}
+                                            </div>
                                         </div>
                                     </Link>
                                 )) : (
@@ -150,37 +154,45 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
                             </div>
                             <Link
                                 href="/news"
-                                className="inline-flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white mt-4 uppercase tracking-wide transition-colors"
+                                className="block mt-6 text-center text-xs font-black text-black dark:text-white hover:opacity-70 uppercase tracking-widest transition-opacity"
                             >
-                                View All News <ArrowRight className="w-3 h-3" />
+                                View All News
                             </Link>
                         </div>
 
-                        {/* 2. Betting Sites Widget */}
+                        {/* 2. Betting Sites Widget - Native Look */}
                         {sidebarSites.length > 0 && (
-                            <div className="bg-gray-50 dark:bg-neutral-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm mt-8">
-                                <h3 className="text-lg font-black uppercase text-neutral-900 dark:text-white mb-5 flex items-center gap-2">
-                                    <Trophy className="w-5 h-5 text-yellow-500" /> Top Picks
+                            <div className="pt-8 border-t border-gray-100 dark:border-gray-800 mt-8">
+                                <h3 className="text-sm font-black uppercase text-gray-400 mb-6 tracking-widest">
+                                    Exclusive Offers
                                 </h3>
 
-                                <div className="space-y-3">
+                                <div className="space-y-6">
                                     {sidebarSites.map((site: any) => (
-                                        <div key={site._id} className="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-black shadow-sm hover:shadow-md transition-all border border-gray-100 dark:border-gray-800">
-                                            <div className="w-10 h-10 rounded-lg bg-white p-0.5 flex items-center justify-center shrink-0 border border-gray-100">
-                                                <img src={site.logoUrl} alt={site.name} className="w-full h-full object-contain" />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="font-bold text-sm text-neutral-900 dark:text-white truncate">{site.name}</h4>
-                                                <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold">
-                                                    <Star className="w-3 h-3 fill-current" />
-                                                    {site.rating}/10
+                                        <div key={site._id} className="group relative flex flex-col gap-3 pb-6 border-b border-gray-100 dark:border-gray-800 last:border-0 pl-1">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-20 h-20 rounded-lg bg-gray-50 dark:bg-gray-800 p-2 flex items-center justify-center shrink-0 border border-gray-100 dark:border-gray-700">
+                                                    <img src={site.logoUrl} alt={site.name} className="w-full h-full object-contain" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-black text-lg text-neutral-900 dark:text-white leading-none mb-1.5">{site.name}</h4>
+                                                    {(site.mainBonusText || site.joiningBonus) && (
+                                                        <div className="inline-block bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-black uppercase tracking-wide px-2 py-1 rounded-sm mb-1.5">
+                                                            {site.mainBonusText || site.joiningBonus}
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-center gap-1 text-yellow-500 text-xs font-bold">
+                                                        <Star className="w-4 h-4 fill-current" />
+                                                        {site.rating}/10
+                                                    </div>
                                                 </div>
                                             </div>
+
                                             <a
                                                 href={site.slug ? `/${site.slug}` : '#'}
-                                                className="px-3 py-1.5 bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold rounded-lg hover:opacity-80 transition-opacity whitespace-nowrap"
+                                                className="w-full block text-center py-2 bg-black dark:bg-white text-white dark:text-black text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity rounded-sm"
                                             >
-                                                Visit
+                                                {site.ctaText || "Claim Bonus"}
                                             </a>
                                         </div>
                                     ))}
@@ -188,9 +200,9 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
 
                                 <Link
                                     href="/offers"
-                                    className="block w-full py-3 mt-5 bg-primary text-white text-sm font-bold text-center rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+                                    className="block mt-4 text-center text-xs font-bold text-gray-400 hover:text-black dark:hover:text-white uppercase tracking-wider transition-colors"
                                 >
-                                    Get Offers
+                                    View All Offers →
                                 </Link>
                             </div>
                         )}

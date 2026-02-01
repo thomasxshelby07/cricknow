@@ -156,61 +156,41 @@ export function BlogDetailView({ blog, ads, coupons = [] }: { blog: any, ads: an
 
 
 
-                        {/* 1. Related Betting Sites (Premier Ad Style) */}
+                        {/* 1. Related Betting Sites (Native Ad Style) */}
                         {blog.relatedSites && blog.relatedSites.length > 0 && (
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between px-1">
-                                    <h3 className="text-xl font-black text-neutral-900 dark:text-white flex items-center gap-2">
-                                        <Award className="w-6 h-6 text-primary" />
-                                        Recommended
-                                    </h3>
-                                    <span className="text-[10px] font-bold tracking-wider uppercase text-gray-400 border border-gray-200 dark:border-gray-700 px-2 py-0.5 rounded">Ad</span>
-                                </div>
+                            <div className="pt-4">
+                                <h3 className="text-sm font-black uppercase text-gray-400 mb-6 tracking-widest">
+                                    Exclusive Offers
+                                </h3>
 
-                                <div className="space-y-5">
+                                <div className="space-y-6">
                                     {blog.relatedSites.map((site: any) => (
-                                        <div key={site._id} className="group relative bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
-                                            {/* Shine Effect */}
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 z-10 pointer-events-none" />
-
-                                            <div className="flex items-start justify-between gap-4 mb-3 relative z-20">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-14 h-14 rounded-xl bg-white p-1 shadow-sm border-2 border-gray-50 flex items-center justify-center shrink-0">
-                                                        <img src={site.logoUrl} alt={site.name} className="w-full h-full object-contain" />
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="font-extrabold text-lg text-neutral-900 dark:text-white leading-none mb-1">{site.name}</h4>
-                                                        <div className="flex items-center gap-1">
-                                                            <div className="flex text-yellow-400">
-                                                                <Star className="w-3.5 h-3.5 fill-current" />
-                                                                <Star className="w-3.5 h-3.5 fill-current" />
-                                                                <Star className="w-3.5 h-3.5 fill-current" />
-                                                                <Star className="w-3.5 h-3.5 fill-current" />
-                                                                <Star className="w-3.5 h-3.5 fill-current" />
-                                                            </div>
-                                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 ml-1">{site.rating}/10</span>
+                                        <div key={site._id} className="group relative flex flex-col gap-3 pb-6 border-b border-gray-100 dark:border-gray-800 last:border-0 pl-1">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-20 h-20 rounded-lg bg-gray-50 dark:bg-gray-800 p-2 flex items-center justify-center shrink-0 border border-gray-100 dark:border-gray-700">
+                                                    <img src={site.logoUrl} alt={site.name} className="w-full h-full object-contain" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-black text-lg text-neutral-900 dark:text-white leading-none mb-1.5">{site.name}</h4>
+                                                    {(site.mainBonusText || site.joiningBonus) && (
+                                                        <div className="inline-block bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-black uppercase tracking-wide px-2 py-1 rounded-sm mb-1.5">
+                                                            {site.mainBonusText || site.joiningBonus}
                                                         </div>
+                                                    )}
+                                                    <div className="flex items-center gap-1 text-yellow-500 text-xs font-bold">
+                                                        <Star className="w-4 h-4 fill-current" />
+                                                        {site.rating}/10
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {site.joiningBonus && (
-                                                <div className="mb-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-100 dark:border-green-800 rounded-lg p-2.5 text-center relative z-20">
-                                                    <p className="text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-wide mb-0.5">Exclusive Offer</p>
-                                                    <p className="font-black text-sm text-neutral-800 dark:text-neutral-100 leading-tight">{site.joiningBonus}</p>
-                                                </div>
-                                            )}
-
                                             <a
-                                                href={site.affiliateLink || "#"}
-                                                target="_blank"
-                                                rel="nofollow noreferrer"
-                                                className="block relative z-20"
+                                                href={site.affiliateLink || (site.slug ? `/${site.slug}` : '#')}
+                                                target={site.affiliateLink ? "_blank" : "_self"}
+                                                rel={site.affiliateLink ? "nofollow noreferrer" : ""}
+                                                className="w-full block text-center py-2 bg-black dark:bg-white text-white dark:text-black text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity rounded-sm"
                                             >
-                                                <Button className="w-full h-11 text-base font-bold bg-neutral-900 text-white hover:bg-black dark:bg-white dark:text-neutral-900 dark:hover:bg-gray-100 shadow-md transform active:scale-95 transition-all">
-                                                    Play Now
-                                                    <ChevronRight className="w-4 h-4 ml-1 opacity-60" />
-                                                </Button>
+                                                {site.ctaText || "Claim Bonus"}
                                             </a>
                                         </div>
                                     ))}

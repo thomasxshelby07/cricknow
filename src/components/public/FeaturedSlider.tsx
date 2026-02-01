@@ -93,19 +93,27 @@ export function FeaturedSlider({ items, basePath }: FeaturedSliderProps) {
                                 {item.summary || item.excerpt}
                             </p>
 
-                            <div className="flex items-center gap-4 mt-1 md:mt-0">
+                            <div className="hidden md:flex items-center gap-4 mt-1 md:mt-0">
                                 <Link
                                     href={`${basePath}/${item.slug}`}
                                     className="inline-flex items-center gap-1.5 bg-white text-black px-4 py-1.5 md:px-5 md:py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-gray-200 transition-all shadow-md"
                                 >
                                     {basePath.includes('news') ? 'Read News' : 'Read Article'} <ArrowRight className="w-3.5 h-3.5" />
                                 </Link>
+                            </div>
 
-                                {/* Mobile Date */}
-                                <div className="flex md:hidden items-center gap-1.5 text-[10px] text-gray-400 font-medium">
+                            {/* Mobile specific layout for better visibility */}
+                            <div className="md:hidden mt-auto">
+                                <div className="flex items-center gap-2 mb-2 text-[10px] text-gray-300 font-bold uppercase tracking-wide">
                                     <Calendar className="w-3 h-3" />
                                     {format(new Date(item.createdAt), 'MMM d, yyyy')}
                                 </div>
+                                <Link
+                                    href={`${basePath}/${item.slug}`}
+                                    className="inline-block text-xs font-black text-white border-b border-white pb-0.5"
+                                >
+                                    Read Now →
+                                </Link>
                             </div>
                         </div>
 

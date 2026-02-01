@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     description: "Stay updated with the latest cricket news, match analysis, and player updates.",
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getNewsData(category?: string) {
     await connectToDatabase();
 
@@ -54,7 +57,7 @@ async function getSidebarSites() {
         'visibility.status': 'published',
         showOnNewsSidebar: true
     })
-        .select('name slug logoUrl rating ctaText')
+        .select('name slug logoUrl rating ctaText mainBonusText joiningBonus')
         .sort({ 'visibility.displayOrder': 1 })
         .limit(5)
         .lean();
@@ -172,42 +175,50 @@ export default async function NewsPage({ searchParams }: { searchParams: { categ
                     {/* Sidebar Area */}
                     <aside className="lg:col-span-4 space-y-8">
 
-                        {/* Betting Sites Widget */}
-                        <div className="bg-gray-50 dark:bg-neutral-900 rounded-3xl p-6 md:p-8 sticky top-24">
-                            <h3 className="text-xl font-black uppercase text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
-                                <Trophy className="w-5 h-5 text-yellow-500" /> Top Picks
+                        {/* Betting Sites Widget - Native Look */}
+                        <div className="pt-4">
+                            <h3 className="text-sm font-black uppercase text-gray-400 mb-6 tracking-widest">
+                                Exclusive Offers
                             </h3>
 
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {sidebarSites.length > 0 ? sidebarSites.map((site: any) => (
-                                    <div key={site._id} className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-black shadow-sm hover:shadow-md transition-all">
-                                        <div className="w-12 h-12 rounded-xl bg-gray-100 p-1 flex items-center justify-center shrink-0">
-                                            <img src={site.logoUrl} alt={site.name} className="w-full h-full object-contain" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="font-bold text-neutral-900 dark:text-white truncate">{site.name}</h4>
-                                            <div className="flex items-center gap-1 text-yellow-500 text-xs font-bold">
-                                                <Star className="w-3 h-3 fill-current" />
-                                                {site.rating}/10
+                                    <div key={site._id} className="group relative flex flex-col gap-3 pb-6 border-b border-gray-100 dark:border-gray-800 last:border-0">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-14 h-14 rounded-xl bg-gray-50 dark:bg-gray-800 p-2 flex items-center justify-center shrink-0 border border-gray-100 dark:border-gray-700">
+                                                <img src={site.logoUrl} alt={site.name} className="w-full h-full object-contain" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-black text-lg text-neutral-900 dark:text-white leading-none mb-1">{site.name}</h4>
+                                                {site.mainBonusText && (
+                                                    <p className="text-xs text-center text-primary font-bold uppercase tracking-wider mb-2">
+                                                        {site.mainBonusText}
+                                                    </p>
+                                                )}
+                                                <div className="flex items-center gap-1 text-yellow-500 text-xs font-bold">
+                                                    <Star className="w-3 h-3 fill-current" />
+                                                    {site.rating}/10
+                                                </div>
                                             </div>
                                         </div>
+
                                         <a
                                             href={site.slug ? `/${site.slug}` : '#'}
-                                            className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-xs font-bold rounded-lg hover:opacity-80 transition-opacity whitespace-nowrap"
+                                            className="w-full block text-center py-3 bg-black dark:bg-white text-white dark:text-black text-sm font-black uppercase tracking-wide rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-black/10 dark:shadow-white/10"
                                         >
-                                            Visit
+                                            {site.ctaText || "Claim Bonus"}
                                         </a>
                                     </div>
                                 )) : (
-                                    <p className="text-center text-gray-400 text-sm">No sites available.</p>
+                                    <p className="text-gray-400 text-sm">No offers available.</p>
                                 )}
                             </div>
 
                             <Link
                                 href="/offers"
-                                className="block w-full py-4 mt-6 bg-primary text-white font-bold text-center rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+                                className="block mt-4 text-center text-xs font-bold text-gray-400 hover:text-black dark:hover:text-white uppercase tracking-wider transition-colors"
                             >
-                                Get Exclusive Offers
+                                View All Offers →
                             </Link>
                         </div>
                     </aside>
