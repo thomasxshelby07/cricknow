@@ -14,6 +14,7 @@ export interface NewsFormData {
     relatedSites?: string[]; // IDs
     relatedNews?: string[]; // IDs
     relatedBlogs?: string[]; // IDs of related blogs
+    relatedCoupons?: string[]; // IDs of related coupons
 
     // Smart SEO
     customH1?: string;
@@ -57,6 +58,7 @@ export const initialNewsState: NewsFormData = {
     relatedSites: [],
     relatedNews: [],
     relatedBlogs: [],
+    relatedCoupons: [],
     customH1: '',
     lastUpdated: '',
     internalLinks: [],

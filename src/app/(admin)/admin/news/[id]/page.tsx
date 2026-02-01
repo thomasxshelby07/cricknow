@@ -24,7 +24,16 @@ export default function EditNewsPage() {
         fetch(`/api/admin/news/${id}`)
             .then((res) => res.json())
             .then((json) => {
-                if (json.success) setData(json.data);
+                if (json.success) {
+                    const formattedData = {
+                        ...json.data,
+                        relatedSites: json.data.relatedSites?.map((s: any) => typeof s === 'object' ? s._id : s) || [],
+                        relatedNews: json.data.relatedNews?.map((n: any) => typeof n === 'object' ? n._id : n) || [],
+                        relatedBlogs: json.data.relatedBlogs?.map((b: any) => typeof b === 'object' ? b._id : b) || [],
+                        relatedCoupons: json.data.relatedCoupons?.map((c: any) => typeof c === 'object' ? c._id : c) || []
+                    };
+                    setData(formattedData);
+                }
                 else {
                     toast.error("Failed to load news");
                     router.push("/admin/news");

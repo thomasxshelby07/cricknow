@@ -679,23 +679,21 @@ export function VisibilityTab({ data, updateData, updateNestedData }: TabProps) 
                 <div className="space-y-4 border p-4 rounded-md">
                     <h4 className="font-semibold text-sm">Category Pages</h4>
                     <div className="flex items-center gap-2">
+                        <Switch checked={data.showOnGamesPage} onCheckedChange={(c: boolean) => updateData({ showOnGamesPage: c })} />
+                        <Label>Show on Games Core Page</Label>
+                    </div>
+                    {/* Deprecated Category Pages 
+                    <div className="flex items-center gap-2">
                         <Switch checked={data.showOnCricket} onCheckedChange={(c) => updateData({ showOnCricket: c })} />
                         <Label>Show on Cricket Hub</Label>
                     </div>
+                    */}
                     <div className="flex items-center gap-2">
-                        <Switch checked={data.showOnOffers} onCheckedChange={(c) => updateData({ showOnOffers: c })} />
-                        <Label>Show on Offers Hub</Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Switch checked={data.showOnCasino} onCheckedChange={(c) => updateData({ showOnCasino: c })} />
-                        <Label>Show on Casino Hub</Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Switch checked={data.showOnNewsSidebar} onCheckedChange={(c) => updateData({ showOnNewsSidebar: c })} />
+                        <Switch checked={data.showOnNewsSidebar} onCheckedChange={(c: boolean) => updateData({ showOnNewsSidebar: c })} />
                         <Label>Show on News Sidebar</Label>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Switch checked={data.showOnBlogSidebar} onCheckedChange={(c) => updateData({ showOnBlogSidebar: c })} />
+                        <Switch checked={data.showOnBlogSidebar} onCheckedChange={(c: boolean) => updateData({ showOnBlogSidebar: c })} />
                         <Label>Show on Blog Sidebar</Label>
                     </div>
                 </div>

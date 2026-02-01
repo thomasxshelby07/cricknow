@@ -13,7 +13,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         await connectToDatabase();
-        const news = await News.findById(id);
+        const news = await News.findById(id)
+            .populate('relatedSites')
+            .populate('relatedNews')
+            .populate('relatedBlogs')
+            .populate('relatedCoupons');
         if (!news) return NextResponse.json({ error: "News not found" }, { status: 404 });
 
         return NextResponse.json({ success: true, data: news });
@@ -44,7 +48,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
                     ...body,
                     relatedSites: body.relatedSites,
                     relatedNews: body.relatedNews,
-                    relatedBlogs: body.relatedBlogs
+                    relatedBlogs: body.relatedBlogs,
+                    relatedCoupons: body.relatedCoupons
                 }
             },
             { new: true, runValidators: true }

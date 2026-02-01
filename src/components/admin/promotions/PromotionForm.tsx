@@ -35,25 +35,38 @@ export function PromotionForm({ initialData, isEditing = false }: PromotionFormP
         displaySettings: {
             mode: initialData?.displaySettings?.mode || 'all',
             includedBlogs: initialData?.displaySettings?.includedBlogs || [],
-            includedNews: initialData?.displaySettings?.includedNews || []
+            includedNews: initialData?.displaySettings?.includedNews || [],
+            includedGames: (initialData?.displaySettings as any)?.includedGames || []
         }
     });
 
-    const [contentList, setContentList] = useState<{ blogs: any[], news: any[] }>({ blogs: [], news: [] });
+    const [contentList, setContentList] = useState<{
+        blogs: any[], news: any[], games: any[],
+        blogSearch?: string, newsSearch?: string, gameSearch?: string
+    }>({ blogs: [], news: [], games: [] });
 
     useEffect(() => {
         // Fetch list of blogs and news for targeting
         fetch('/api/admin/content-list')
             .then(res => res.json())
             .then(data => {
-                if (data.blogs) setContentList(data);
+                if (data.blogs) setContentList(prev => ({
+                    blogs: data.blogs || [],
+                    news: data.news || [],
+                    games: data.games || []
+                }));
             })
             .catch(err => console.error("Failed to load content list", err));
     }, []);
 
-    const toggleSelection = (type: 'blogs' | 'news', id: string) => {
-        const field = type === 'blogs' ? 'includedBlogs' : 'includedNews';
-        const current = formData.displaySettings[field] as string[];
+    const toggleSelection = (type: 'blogs' | 'news' | 'games', id: string) => {
+        let field = '';
+        if (type === 'blogs') field = 'includedBlogs';
+        if (type === 'news') field = 'includedNews';
+        if (type === 'games') field = 'includedGames';
+
+        const key = field as keyof typeof formData.displaySettings;
+        const current = (formData.displaySettings[key] || []) as string[];
         const next = current.includes(id)
             ? current.filter(i => i !== id)
             : [...current, id];
@@ -192,41 +205,91 @@ export function PromotionForm({ initialData, isEditing = false }: PromotionFormP
 
                         {formData.displaySettings.mode === 'specific' && (
                             <div className="space-y-4 p-4 border rounded-lg bg-gray-50">
+
+                                {/* Search State */}
+                                { /* Note: We use local filtering for better UX as lists shouldn't be massive yet. */}
+
                                 {/* Blogs Selection */}
                                 <div className="space-y-2">
-                                    <Label className="flex justify-between">
+                                    <Label className="flex justify-between items-center">
                                         <span>Select Blogs</span>
                                         <span className="text-xs text-gray-500">{formData.displaySettings.includedBlogs.length} selected</span>
                                     </Label>
+                                    <div className="pb-2">
+                                        <Input
+                                            placeholder="Search blogs..."
+                                            className="h-8 text-sm"
+                                            onChange={(e) => setContentList(prev => ({ ...prev, blogSearch: e.target.value }))}
+                                        />
+                                    </div>
                                     <div className="h-40 overflow-y-auto border rounded bg-white p-2 space-y-1">
-                                        {contentList.blogs.map((blog: any) => (
-                                            <label key={blog._id} className="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-sm">
-                                                <Checkbox
-                                                    checked={formData.displaySettings.includedBlogs.includes(blog._id)}
-                                                    onCheckedChange={() => toggleSelection('blogs', blog._id)}
-                                                />
-                                                <span className="truncate">{blog.title}</span>
-                                            </label>
-                                        ))}
+                                        {contentList.blogs
+                                            .filter(item => !contentList['blogSearch'] || item.title.toLowerCase().includes(contentList['blogSearch'].toLowerCase()))
+                                            .map((blog: any) => (
+                                                <label key={blog._id} className="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-sm">
+                                                    <Checkbox
+                                                        checked={formData.displaySettings.includedBlogs.includes(blog._id)}
+                                                        onCheckedChange={() => toggleSelection('blogs', blog._id)}
+                                                    />
+                                                    <span className="truncate">{blog.title}</span>
+                                                </label>
+                                            ))}
                                     </div>
                                 </div>
 
                                 {/* News Selection */}
                                 <div className="space-y-2">
-                                    <Label className="flex justify-between">
+                                    <Label className="flex justify-between items-center">
                                         <span>Select News</span>
                                         <span className="text-xs text-gray-500">{formData.displaySettings.includedNews.length} selected</span>
                                     </Label>
+                                    <div className="pb-2">
+                                        <Input
+                                            placeholder="Search news..."
+                                            className="h-8 text-sm"
+                                            onChange={(e) => setContentList(prev => ({ ...prev, newsSearch: e.target.value }))}
+                                        />
+                                    </div>
                                     <div className="h-40 overflow-y-auto border rounded bg-white p-2 space-y-1">
-                                        {contentList.news.map((item: any) => (
-                                            <label key={item._id} className="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-sm">
-                                                <Checkbox
-                                                    checked={formData.displaySettings.includedNews.includes(item._id)}
-                                                    onCheckedChange={() => toggleSelection('news', item._id)}
-                                                />
-                                                <span className="truncate">{item.title}</span>
-                                            </label>
-                                        ))}
+                                        {contentList.news
+                                            .filter(item => !contentList['newsSearch'] || item.title.toLowerCase().includes(contentList['newsSearch'].toLowerCase()))
+                                            .map((item: any) => (
+                                                <label key={item._id} className="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-sm">
+                                                    <Checkbox
+                                                        checked={formData.displaySettings.includedNews.includes(item._id)}
+                                                        onCheckedChange={() => toggleSelection('news', item._id)}
+                                                    />
+                                                    <span className="truncate">{item.title}</span>
+                                                </label>
+                                            ))}
+                                    </div>
+                                </div>
+
+                                {/* Games Selection */}
+                                <div className="space-y-2">
+                                    <Label className="flex justify-between items-center">
+                                        <span>Select Games</span>
+                                        <span className="text-xs text-gray-500">{(formData.displaySettings.includedGames || []).length} selected</span>
+                                    </Label>
+                                    <div className="pb-2">
+                                        <Input
+                                            placeholder="Search games..."
+                                            className="h-8 text-sm"
+                                            onChange={(e) => setContentList(prev => ({ ...prev, gameSearch: e.target.value }))}
+                                        />
+                                    </div>
+                                    <div className="h-40 overflow-y-auto border rounded bg-white p-2 space-y-1">
+                                        {contentList.games
+                                            .filter(item => !contentList['gameSearch'] || item.title.toLowerCase().includes(contentList['gameSearch'].toLowerCase()))
+                                            .map((item: any) => (
+                                                <label key={item._id} className="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer text-sm">
+                                                    <Checkbox
+                                                        checked={formData.displaySettings.includedGames.includes(item._id)}
+                                                        onCheckedChange={() => toggleSelection('games', item._id)}
+                                                    />
+                                                    <span className="truncate">{item.title}</span>
+                                                </label>
+                                            ))}
                                     </div>
                                 </div>
                             </div>

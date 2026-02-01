@@ -4,8 +4,9 @@ import { ArrowLeft, Calendar, Facebook, Linkedin, Share2, Timer, Twitter, Star, 
 import { Button } from "@/components/ui/button";
 import { SidebarAd } from "@/components/ads/SidebarAd";
 import { ContentWithAds } from "@/components/ads/ContentWithAds";
+import { CouponBanner } from "@/components/public/CouponBanner";
 
-export function BlogDetailView({ blog, ads }: { blog: any, ads: any[] }) {
+export function BlogDetailView({ blog, ads, coupons = [] }: { blog: any, ads: any[], coupons?: any[] }) {
     if (!blog) return null;
 
     // JSON-LD Construction
@@ -104,6 +105,35 @@ export function BlogDetailView({ blog, ads }: { blog: any, ads: any[] }) {
                 </div>
             </div>
 
+            {/* Coupon Strip - Below Header */}
+            {blog.relatedCoupons && blog.relatedCoupons.length > 0 && (
+                <div className="bg-white dark:bg-black py-2 md:py-3 mb-6">
+                    <div className="container mx-auto px-2 md:px-4">
+                        <div className="w-full">
+                            {blog.relatedCoupons.slice(0, 1).map((coupon: any) => (
+                                <CouponBanner
+                                    key={coupon._id}
+                                    coupon={{
+                                        _id: coupon._id,
+                                        title: coupon.name,
+                                        description: coupon.offer,
+                                        bonusCode: coupon.couponCode,
+                                        bonusAmount: coupon.bonusAmount,
+                                        ctaText: coupon.buttonText,
+                                        redirectUrl: coupon.redirectLink,
+                                        images: {
+                                            horizontal: coupon.imageUrl,
+                                            vertical: coupon.imageUrl,
+                                        },
+                                    }}
+                                    variant="horizontal"
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
@@ -123,6 +153,8 @@ export function BlogDetailView({ blog, ads }: { blog: any, ads: any[] }) {
                     <div className="lg:col-span-4 space-y-8">
 
                         <SidebarAd ads={ads} />
+
+
 
                         {/* 1. Related Betting Sites (Premier Ad Style) */}
                         {blog.relatedSites && blog.relatedSites.length > 0 && (

@@ -13,6 +13,7 @@ const NewsSchema = new mongoose.Schema({
     relatedSites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BettingSite' }],
     relatedNews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'News' }],
     relatedBlogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Blog' }],
+    relatedCoupons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Coupon' }],
 
     // Smart SEO Fields
     customH1: { type: String },

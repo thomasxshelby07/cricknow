@@ -37,6 +37,7 @@ const BettingSiteSchema = new mongoose.Schema({
     },
 
     // Specific Visibility Flags (Extended)
+    showOnGamesPage: { type: Boolean, default: false }, // New Games Core Page
     showOnOffers: { type: Boolean, default: false },
     showOnCasino: { type: Boolean, default: false },
     showOnCricket: { type: Boolean, default: false },
@@ -99,3 +100,4 @@ const BettingSiteSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 export const BettingSite = mongoose.models.BettingSite || mongoose.model('BettingSite', BettingSiteSchema);
+// Schema Update Trigger 1.0

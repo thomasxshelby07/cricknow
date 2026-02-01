@@ -64,6 +64,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
                     ctaText: body.ctaText,
                     seo: body.seo,
                     visibility: body.visibility,
+                    showOnGamesPage: body.showOnGamesPage, // New
                     showOnOffers: body.showOnOffers,
                     showOnCasino: body.showOnCasino,
                     showOnCricket: body.showOnCricket,

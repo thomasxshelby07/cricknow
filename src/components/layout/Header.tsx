@@ -29,8 +29,9 @@ const BLOGS_MENU = [
 ];
 
 const SIMPLE_NAV_LINKS = [
-    { label: "Contact Us", href: "/contact" },
+    { label: "Games", href: "/games" },
     { label: "Apps", href: "/cricket-apps" },
+    { label: "Contact Us", href: "/contact" },
 ];
 
 export function Header() {
@@ -75,6 +76,14 @@ export function Header() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Bonuses & Coupons Link */}
+                    <Link
+                        href="/bonuses"
+                        className="text-sm font-bold uppercase tracking-wide text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white transition-colors hover:scale-105 transform"
+                    >
+                        Bonuses & Coupons
+                    </Link>
 
                     {/* News Dropdown */}
                     <div className="relative group">
@@ -168,6 +177,17 @@ export function Header() {
                                     ))}
                                 </div>
                             )}
+                        </div>
+
+                        {/* Mobile: Bonuses & Coupons */}
+                        <div className="border-b border-gray-100 dark:border-gray-900 pb-2">
+                            <Link
+                                href="/bonuses"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="flex w-full items-center justify-between text-lg font-bold text-gray-600 dark:text-gray-400 py-3 hover:text-black dark:hover:text-white"
+                            >
+                                Bonuses & Coupons
+                            </Link>
                         </div>
 
                         {/* Mobile: News */}

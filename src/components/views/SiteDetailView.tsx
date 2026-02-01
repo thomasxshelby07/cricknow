@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Star, CheckCircle, XCircle, ExternalLink, ShieldCheck, Calendar, Globe, Building2, ChevronRight, Home, ArrowRight } from "lucide-react";
+import { Star, CheckCircle, XCircle, ExternalLink, ShieldCheck, Calendar, Globe, Building2, ChevronRight, Home, ArrowRight, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { StickySiteHeader } from "@/components/ui/StickySiteHeader"; // Import the client component
+import { StickySiteHeader } from "@/components/ui/StickySiteHeader";
+import { FAQAccordion } from "@/components/ui/FAQAccordion";
 
 export function SiteDetailView({ site }: { site: any }) {
     if (!site) return null;
@@ -176,7 +177,7 @@ export function SiteDetailView({ site }: { site: any }) {
                             </div>
                         )}
 
-                        {/* User Reviews */}
+                        {/* User Reviews - BLACK & WHITE */}
                         {displaySite.userReviews?.length > 0 && (
                             <div className="pt-16 border-t border-gray-100 dark:border-neutral-800">
                                 <div className="flex items-center justify-between mb-10">
@@ -187,43 +188,54 @@ export function SiteDetailView({ site }: { site: any }) {
                                     </div>
                                 </div>
                                 <div className="grid md:grid-cols-2 gap-6">
-                                    {displaySite.userReviews.map((review: any, i: number) => (
-                                        <div key={i} className="p-8 bg-gray-50 dark:bg-neutral-900 rounded-3xl border border-gray-100 dark:border-neutral-800">
-                                            <div className="flex items-center justify-between mb-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-black text-lg">
-                                                        {review.user[0]}
+                                    {displaySite.userReviews.map((review: any, i: number) => {
+                                        const isHighRating = review.rating >= 4;
+                                        return (
+                                            <div
+                                                key={i}
+                                                className="relative p-6 rounded-2xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 transition-all duration-300 hover:border-black dark:hover:border-white hover:shadow-lg group"
+                                            >
+                                                <Quote className="absolute top-4 right-4 w-10 h-10 opacity-5 text-gray-400" />
+
+                                                <div className="flex items-center justify-between mb-4 relative z-10">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-12 h-12 rounded-full flex items-center justify-center font-black text-lg bg-black dark:bg-white text-white dark:text-black shadow-md transition-all duration-300 group-hover:scale-105">
+                                                            {review.user[0]}
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="font-bold text-base text-black dark:text-white">{review.user}</h4>
+                                                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{review.date}</div>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <h4 className="font-bold text-black dark:text-white text-lg">{review.user}</h4>
-                                                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">{review.date}</div>
+                                                    <div className="flex gap-0.5">
+                                                        {Array.from({ length: 5 }).map((_, j) => (
+                                                            <Star
+                                                                key={j}
+                                                                className={cn(
+                                                                    "w-3.5 h-3.5 transition-all duration-200",
+                                                                    j < review.rating
+                                                                        ? "fill-black text-black dark:fill-white dark:text-white"
+                                                                        : "fill-gray-200 text-gray-200 dark:fill-neutral-800 dark:text-neutral-800"
+                                                                )}
+                                                            />
+                                                        ))}
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-1 text-black dark:text-white">
-                                                    {Array.from({ length: 5 }).map((_, j) => (
-                                                        <Star key={j} className={cn("w-3.5 h-3.5", j < review.rating ? "fill-current" : "fill-gray-200 text-gray-200 dark:fill-neutral-800 dark:text-neutral-800")} />
-                                                    ))}
-                                                </div>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed relative z-10">
+                                                    "{review.comment}"
+                                                </p>
                                             </div>
-                                            <p className="text-gray-600 dark:text-gray-300 font-medium leading-relaxed">"{review.comment}"</p>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
 
-                        {/* FAQs */}
+                        {/* FAQs - ACCORDION */}
                         {displaySite.faqs?.length > 0 && (
                             <div className="pt-16 border-t border-gray-100 dark:border-neutral-800">
-                                <h3 className="text-3xl font-black text-black dark:text-white mb-8 tracking-tight">FAQ</h3>
-                                <div className="grid gap-4">
-                                    {displaySite.faqs.map((faq: any, i: number) => (
-                                        <div key={i} className="border border-gray-100 dark:border-neutral-800 rounded-2xl p-8 bg-gray-50 dark:bg-neutral-900">
-                                            <h4 className="font-bold text-lg text-black dark:text-white mb-3">{faq.question}</h4>
-                                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed font-medium">{faq.answer}</p>
-                                        </div>
-                                    ))}
-                                </div>
+                                <h3 className="text-3xl font-black text-black dark:text-white mb-8 tracking-tight">Frequently Asked Questions</h3>
+                                <FAQAccordion faqs={displaySite.faqs} />
                             </div>
                         )}
 
@@ -254,46 +266,46 @@ export function SiteDetailView({ site }: { site: any }) {
                     <div className="hidden lg:col-span-4 relative lg:block">
                         <div className="sticky top-28 space-y-8">
 
-                            {/* Main CTA Card - Premium B&W + Amber Highlight */}
-                            <div className="bg-white dark:bg-neutral-950 rounded-3xl p-6 border border-gray-200 dark:border-neutral-800 shadow-xl shadow-gray-200/50 dark:shadow-none relative overflow-hidden group">
+                            {/* Main CTA Card - Premium B&W + Amber Highlight - COMPACT */}
+                            <div className="bg-white dark:bg-neutral-950 rounded-2xl p-4 border border-gray-200 dark:border-neutral-800 shadow-xl shadow-gray-200/50 dark:shadow-none relative overflow-hidden group">
                                 <div className="absolute top-0 left-0 w-full h-1 bg-black dark:bg-white"></div>
 
-                                <div className="w-24 h-24 mx-auto bg-gray-50 dark:bg-white rounded-2xl flex items-center justify-center p-4 mb-6 border border-gray-100 relative group-hover:scale-105 transition-transform duration-300">
+                                <div className="w-16 h-16 mx-auto bg-gray-50 dark:bg-white rounded-xl flex items-center justify-center p-3 mb-3 border border-gray-100 relative group-hover:scale-105 transition-transform duration-300">
                                     {displaySite.logoUrl ? (
                                         <img src={displaySite.logoUrl} alt={displaySite.name} className="max-w-full max-h-full object-contain" />
                                     ) : (
-                                        <span className="text-3xl font-black text-gray-300">{displaySite.name[0]}</span>
+                                        <span className="text-2xl font-black text-gray-300">{displaySite.name[0]}</span>
                                     )}
                                 </div>
 
-                                <div className="text-center mb-8">
-                                    <div className="flex items-center justify-center gap-2 mb-2">
-                                        <h2 className="text-3xl font-black text-black dark:text-white tracking-tight">{displaySite.name}</h2>
+                                <div className="text-center mb-4">
+                                    <div className="flex items-center justify-center gap-2 mb-1">
+                                        <h2 className="text-2xl font-black text-black dark:text-white tracking-tight">{displaySite.name}</h2>
                                         <div className="flex items-center gap-1 bg-black text-white px-1.5 py-0.5 rounded text-[10px] font-bold">
                                             <Star className="w-2.5 h-2.5 fill-current" />
                                             <span>{displaySite.rating}</span>
                                         </div>
                                     </div>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Premium Betting Partner</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Premium Betting Partner</p>
                                 </div>
 
-                                {/* Offer Highlight - Amber */}
-                                <div className="bg-amber-50 dark:bg-amber-900/10 p-6 rounded-2xl mb-8 text-center border border-amber-100 dark:border-amber-900/20">
-                                    <p className="text-[10px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-2">Exclusive Offer</p>
-                                    <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-600 dark:from-amber-400 dark:to-orange-500 leading-none tracking-tight">
+                                {/* Offer Highlight - Amber - COMPACT */}
+                                <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl mb-4 text-center border border-amber-100 dark:border-amber-900/20">
+                                    <p className="text-[9px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-1">Exclusive Offer</p>
+                                    <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-600 dark:from-amber-400 dark:to-orange-500 leading-none tracking-tight">
                                         {displaySite.joiningBonus || "100% Bonus"}
                                     </p>
                                     {displaySite.reDepositBonus && (
-                                        <p className="text-xs font-bold text-gray-500 mt-2">+ {displaySite.reDepositBonus} Reload</p>
+                                        <p className="text-[10px] font-bold text-gray-500 mt-1">+ {displaySite.reDepositBonus} Reload</p>
                                     )}
                                 </div>
 
                                 <a href={displaySite.affiliateLink} target="_blank" rel="nofollow noreferrer" className="block w-full">
-                                    <Button className="w-full h-14 text-sm font-black uppercase tracking-widest rounded-xl bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 text-white shadow-xl hover:-translate-y-1 transition-all">
+                                    <Button className="w-full h-12 text-xs font-black uppercase tracking-widest rounded-xl bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 text-white shadow-xl hover:-translate-y-1 transition-all">
                                         Claim Bonus Now <ArrowRight className="ml-2 w-4 h-4" />
                                     </Button>
                                 </a>
-                                <p className="text-[10px] text-center text-gray-400 mt-4 font-bold uppercase tracking-widest">
+                                <p className="text-[9px] text-center text-gray-400 mt-3 font-bold uppercase tracking-widest">
                                     <ShieldCheck className="w-3 h-3 inline mr-1" /> Secure & Verified
                                 </p>
                             </div>

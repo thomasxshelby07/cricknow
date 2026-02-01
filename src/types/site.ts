@@ -30,6 +30,7 @@ export interface BettingSiteFormData {
         showOnMenu: boolean;
         displayOrder: number;
     };
+    showOnGamesPage: boolean; // New
     showOnOffers: boolean;
     showOnCasino: boolean;
     showOnCricket: boolean;
@@ -124,6 +125,7 @@ export const initialSiteState: BettingSiteFormData = {
         showOnMenu: false,
         displayOrder: 0,
     },
+    showOnGamesPage: false,
     showOnOffers: false,
     showOnCasino: false,
     showOnCricket: false,

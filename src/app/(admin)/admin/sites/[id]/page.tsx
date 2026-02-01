@@ -26,7 +26,8 @@ export default function EditSitePage() {
             .then((res) => res.json())
             .then((json) => {
                 if (json.success) {
-                    setData(json.data);
+                    // Merge with initial state to ensure new fields (like showOnGamesPage) are present even if DB is old
+                    setData({ ...initialSiteState, ...json.data });
                 } else {
                     toast.error("Failed to load site data");
                     router.push("/admin/sites");

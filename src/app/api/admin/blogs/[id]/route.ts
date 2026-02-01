@@ -50,7 +50,7 @@ export async function PUT(
             id,
             { $set: body },
             { new: true, runValidators: true }
-        ).populate('relatedSites').populate('relatedBlogs').populate('relatedNews');
+        ).populate('relatedSites').populate('relatedBlogs').populate('relatedNews').populate('relatedCoupons');
 
         if (!updatedBlog) {
             return NextResponse.json({ error: "Blog not found" }, { status: 404 });

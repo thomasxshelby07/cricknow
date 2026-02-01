@@ -31,7 +31,11 @@ const PromotionSchema = new mongoose.Schema({
     seo: { type: SEOSchema, default: {} },
     visibility: { type: VisibilitySchema, default: {} },
 
-    // Contexts
+    // Contexts - Page Visibility
+    showOnHome: { type: Boolean, default: false },
+    showOnBlog: { type: Boolean, default: false },
+    showOnNews: { type: Boolean, default: false },
+    showOnBonuses: { type: Boolean, default: true },
     showOnOffers: { type: Boolean, default: true },
     showOnCasino: { type: Boolean, default: false },
     showOnCricket: { type: Boolean, default: false },
@@ -40,7 +44,8 @@ const PromotionSchema = new mongoose.Schema({
     displaySettings: {
         mode: { type: String, enum: ['all', 'specific'], default: 'all' },
         includedBlogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Blog' }],
-        includedNews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'News' }]
+        includedNews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'News' }],
+        includedGames: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game' }]
     },
 
 }, { timestamps: true });

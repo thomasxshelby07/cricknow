@@ -4,6 +4,7 @@ import connectToDatabase from "@/lib/db";
 import { BettingSite } from "@/models/BettingSite";
 import { Blog } from "@/models/Blog";
 import { News } from "@/models/News";
+import { Coupon } from "@/models/Coupon";
 import { getAdsForPage } from "@/lib/ads";
 import { SiteDetailView } from "@/components/views/SiteDetailView";
 import { BlogDetailView } from "@/components/views/BlogDetailView";
@@ -22,18 +23,48 @@ async function getContent(slug: string) {
         .populate('relatedSites', 'name slug logoUrl rating ctaText joiningBonus affiliateLink')
         .populate('relatedNews', 'title slug coverImageUrl createdAt summary')
         .populate('relatedBlogs', 'title slug coverImageUrl createdAt excerpt')
+        .populate('relatedCoupons', 'name slug offer couponCode bonusAmount buttonText redirectLink imageUrl')
         .lean();
-    if (blog) return { type: 'blog', data: blog };
+
+    if (blog) return { type: 'blog', data: JSON.parse(JSON.stringify(blog)) };
 
     // 3. Check News
     const news = await News.findOne({ slug, 'visibility.status': 'published' })
         .populate('relatedSites', 'name slug logoUrl rating ctaText joiningBonus affiliateLink')
         .populate('relatedNews', 'title slug coverImageUrl createdAt summary')
         .populate('relatedBlogs', 'title slug coverImageUrl createdAt excerpt')
+        .populate('relatedCoupons', 'name slug offer couponCode bonusAmount buttonText redirectLink imageUrl')
         .lean();
-    if (news) return { type: 'news', data: news };
+
+    if (news) return { type: 'news', data: JSON.parse(JSON.stringify(news)) };
 
     return null;
+}
+
+// Helper to get coupons for blog pages
+async function getBlogCoupons() {
+    await connectToDatabase();
+    const coupons = await Coupon.find({
+        'visibility.status': 'published',
+        showOnBlog: true
+    })
+        .sort({ 'visibility.displayOrder': 1, createdAt: -1 })
+        .limit(2)
+        .lean();
+    return JSON.parse(JSON.stringify(coupons));
+}
+
+// Helper to get coupons for news pages
+async function getNewsCoupons() {
+    await connectToDatabase();
+    const coupons = await Coupon.find({
+        'visibility.status': 'published',
+        showOnNews: true
+    })
+        .sort({ 'visibility.displayOrder': 1, createdAt: -1 })
+        .limit(2)
+        .lean();
+    return JSON.parse(JSON.stringify(coupons));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -111,10 +142,12 @@ export default async function UnifiedPage({ params }: { params: Promise<{ slug: 
         return <SiteDetailView site={data} />;
     } else if (type === 'blog') {
         const ads = await getAdsForPage('blog', String(data._id));
-        return <BlogDetailView blog={data} ads={ads} />;
+        const coupons = await getBlogCoupons();
+        return <BlogDetailView blog={data} ads={ads} coupons={coupons} />;
     } else if (type === 'news') {
         const ads = await getAdsForPage('news', String(data._id));
-        return <NewsDetailView news={data} ads={ads} />;
+        const coupons = await getNewsCoupons();
+        return <NewsDetailView news={data} ads={ads} coupons={coupons} />;
     }
 
     return notFound();

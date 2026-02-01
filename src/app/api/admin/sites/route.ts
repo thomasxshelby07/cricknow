@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import connectToDatabase from "@/lib/db";
 import { BettingSite } from "@/models/BettingSite";
 import { slugify } from "@/lib/utils";
+import { hasPermission } from "@/lib/permissions";
 
 export const dynamic = 'force-dynamic';
 
@@ -111,9 +112,30 @@ export async function GET(req: NextRequest) {
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         await connectToDatabase();
-        const sites = await BettingSite.find({}).sort({ createdAt: -1 });
+        const sites = await BettingSite.find({}).sort({ 'visibility.displayOrder': 1, createdAt: -1 });
         return NextResponse.json({ success: true, data: sites });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
+
+export async function PATCH(req: NextRequest) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        await connectToDatabase();
+        const { items } = await req.json();
+
+        // Bulk update displayOrder for all items
+        const updatePromises = items.map((item: any, index: number) =>
+            BettingSite.findByIdAndUpdate(item._id, { 'visibility.displayOrder': index })
+        );
+
+        await Promise.all(updatePromises);
+        return NextResponse.json({ success: true });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+

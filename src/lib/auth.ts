@@ -36,6 +36,8 @@ export const authOptions: NextAuthOptions = {
                     name: user.name,
                     email: user.email,
                     role: user.role,
+                    permissions: user.permissions || [],
+                    isActive: user.isActive,
                 };
             }
         })
@@ -45,6 +47,8 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id;
                 token.role = user.role;
+                token.permissions = user.permissions;
+                token.isActive = user.isActive;
             }
             return token;
         },
@@ -52,6 +56,8 @@ export const authOptions: NextAuthOptions = {
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.role = token.role as string;
+                session.user.permissions = token.permissions as string[];
+                session.user.isActive = token.isActive as boolean;
             }
             return session;
         }

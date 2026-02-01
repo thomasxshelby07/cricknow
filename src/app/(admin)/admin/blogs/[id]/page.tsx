@@ -33,7 +33,8 @@ export default function EditBlogPage({ params }: { params: Promise<{ id: string 
                     ...json.data,
                     relatedSites: json.data.relatedSites?.map((s: any) => typeof s === 'object' ? s._id : s) || [],
                     relatedBlogs: json.data.relatedBlogs?.map((b: any) => typeof b === 'object' ? b._id : b) || [],
-                    relatedNews: json.data.relatedNews?.map((n: any) => typeof n === 'object' ? n._id : n) || []
+                    relatedNews: json.data.relatedNews?.map((n: any) => typeof n === 'object' ? n._id : n) || [],
+                    relatedCoupons: json.data.relatedCoupons?.map((c: any) => typeof c === 'object' ? c._id : c) || []
                 };
 
                 setData(formattedData);

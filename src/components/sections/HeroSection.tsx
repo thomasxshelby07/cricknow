@@ -68,9 +68,9 @@ export function HeroSection({
                             {ctaText}
                         </Button>
                     </Link>
-                    <Link href="/cricket-apps">
+                    <Link href="/news">
                         <Button size="lg" variant="outline" className="border-gray-200 bg-white text-black hover:bg-gray-50 hover:border-gray-300 px-10 py-7 text-lg rounded-full transition-all font-semibold">
-                            Explore Apps
+                            Latest News
                         </Button>
                     </Link>
                 </div>

@@ -3,6 +3,7 @@ import { AllBettingSitesGrid } from "@/components/sections/AllBettingSitesGrid";
 import { SEOContent } from "@/components/sections/SEOContent";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { PremiumBettingSiteList } from "@/components/sections/PremiumBettingSiteList";
+import { BettingSitesInfoSection } from "@/components/sections/BettingSitesInfoSection";
 
 export const metadata: Metadata = {
     title: "All Online Betting Sites | Cricknow",
@@ -47,6 +48,8 @@ export default function BettingSitesPage() {
             <div id="all-sites" className="min-h-screen">
                 <PremiumBettingSiteList count={100} />
             </div>
+
+            <BettingSitesInfoSection />
 
             <SEOContent />
 

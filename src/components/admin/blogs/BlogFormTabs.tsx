@@ -114,6 +114,23 @@ export function RelatedContentTab({ data, updateData }: TabProps) {
                     />
                 </div>
             </div>
+
+            {/* Related Coupons */}
+            <div className="space-y-3">
+                <Label>Related Coupons (Sidebar)</Label>
+                <div className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                    <p className="text-sm text-gray-500 mb-3">
+                        Select coupons to display in the "Exclusive Bonuses" sidebar widget.
+                    </p>
+                    <SearchableMultiSelect
+                        placeholder="Search coupons..."
+                        endpoint="/api/admin/coupons"
+                        labelKey="name"
+                        value={data.relatedCoupons || []}
+                        onChange={(val) => updateData({ relatedCoupons: val })}
+                    />
+                </div>
+            </div>
         </div>
     );
 }

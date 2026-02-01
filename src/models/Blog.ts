@@ -20,6 +20,7 @@ const BlogSchema = new mongoose.Schema({
     relatedOffers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Promotion' }],
     relatedBlogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Blog' }],
     relatedNews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'News' }],
+    relatedCoupons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Coupon' }],
 
     // Visibility & SEO
     seo: { type: SEOSchema, default: {} },

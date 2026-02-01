@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import connectToDatabase from "@/lib/db";
 import { News } from "@/models/News";
 import { slugify } from "@/lib/utils";
+import { hasPermission } from "@/lib/permissions";
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,11 @@ export async function POST(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        // Check permission
+        if (!hasPermission(session.user, 'manage_news')) {
+            return NextResponse.json({ error: "You don't have permission to manage news" }, { status: 403 });
+        }
 
         await connectToDatabase();
         const body = await req.json();
@@ -54,9 +60,30 @@ export async function GET(req: NextRequest) {
         if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         await connectToDatabase();
-        const news = await News.find({}).sort({ createdAt: -1 });
+        const news = await News.find({}).sort({ 'visibility.displayOrder': 1, createdAt: -1 });
         return NextResponse.json({ success: true, data: news });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
+
+export async function PATCH(req: NextRequest) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        await connectToDatabase();
+        const { items } = await req.json();
+
+        // Bulk update displayOrder for all items
+        const updatePromises = items.map((item: any, index: number) =>
+            News.findByIdAndUpdate(item._id, { 'visibility.displayOrder': index })
+        );
+
+        await Promise.all(updatePromises);
+        return NextResponse.json({ success: true });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+

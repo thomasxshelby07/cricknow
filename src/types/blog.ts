@@ -10,6 +10,7 @@ export interface BlogFormData {
     relatedSites?: string[]; // IDs of related sites
     relatedBlogs?: string[]; // IDs of related blogs
     relatedNews?: string[]; // IDs of related news
+    relatedCoupons?: string[]; // IDs of related coupons
     seo: {
         metaTitle: string;
         metaDescription: string;
@@ -41,6 +42,7 @@ export const initialBlogState: BlogFormData = {
     relatedSites: [],
     relatedBlogs: [],
     relatedNews: [],
+    relatedCoupons: [],
     customH1: "",
     lastUpdated: "",
     faqs: [],

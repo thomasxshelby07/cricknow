@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import connectToDatabase from "@/lib/db";
 import { HomePageConfig } from "@/models/HomePageConfig";
+import { Coupon } from "@/models/Coupon";
 
 // Components
 import { HeroSection } from "@/components/sections/HeroSection";
@@ -10,6 +11,7 @@ import { NewsGrid } from "@/components/public/NewsGrid";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { AboutPlatform, WhyChooseUs, ResponsibleGaming } from "@/components/sections/StaticHomeSections";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
+import { CouponBanner } from "@/components/public/CouponBanner";
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -37,10 +39,23 @@ async function getHomeConfig() {
     return config;
 }
 
+async function getHomeCoupons() {
+    await connectToDatabase();
+    const coupons = await Coupon.find({
+        'visibility.status': 'published',
+        showOnHome: true
+    })
+        .sort({ 'visibility.displayOrder': 1, createdAt: -1 })
+        .limit(3)
+        .lean();
+    return JSON.parse(JSON.stringify(coupons));
+}
+
 export const revalidate = 60; // Revalidate every minute (or use on-demand revalidation in admin actions)
 
 export default async function HomePage() {
     const config = await getHomeConfig();
+    const coupons = await getHomeCoupons();
 
     return (
         <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
@@ -50,7 +65,7 @@ export default async function HomePage() {
                 title="Bet Smarter on Cricket"
                 subtitle="Compare top-rated betting sites, grab exclusive bonuses, and get expert predictions for every match."
                 ctaText="Find Best Site"
-                ctaLink="#betting-sites"
+                ctaLink="/betting-sites"
             />
 
             {/* 2. BETTING SITES SECTION (Admin Controlled) */}
@@ -93,6 +108,39 @@ export default async function HomePage() {
                     manualIds={config.blogs.selectedIds?.map((id: any) => id.toString())}
                     showOnHomeOnly={true}
                 />
+            )}
+
+            {/* 3.5 COUPONS SECTION */}
+            {coupons.length > 0 && (
+                <div className="container mx-auto px-4 py-16 border-b border-gray-200 dark:border-gray-800">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-bold text-neutral-dark dark:text-white">
+                            Exclusive Bonuses & Coupons
+                        </h2>
+                        <p className="text-gray-500 mt-2">Grab the best offers and boost your betting bankroll</p>
+                    </div>
+                    <div className="space-y-6 max-w-5xl mx-auto">
+                        {coupons.map((coupon: any) => (
+                            <CouponBanner
+                                key={coupon._id}
+                                coupon={{
+                                    _id: coupon._id,
+                                    title: coupon.name,
+                                    description: coupon.offer,
+                                    bonusCode: coupon.couponCode,
+                                    bonusAmount: coupon.bonusAmount,
+                                    ctaText: coupon.buttonText,
+                                    redirectUrl: coupon.redirectLink,
+                                    images: {
+                                        horizontal: coupon.imageUrl,
+                                        vertical: coupon.imageUrl,
+                                    },
+                                }}
+                                variant="horizontal"
+                            />
+                        ))}
+                    </div>
+                </div>
             )}
 
             {/* 4. NEWS SECTION (Admin Controlled) */}
