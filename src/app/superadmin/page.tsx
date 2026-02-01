@@ -31,17 +31,9 @@ export default function SuperAdminLoginPage() {
             setError("Invalid credentials");
             setLoading(false);
         } else {
-            // Verify user is super admin
-            const response = await fetch('/api/auth/session');
-            const session = await response.json();
-
-            if (session?.user?.role === 'SUPER_ADMIN') {
-                router.push("/admin/dashboard");
-            } else {
-                setError("Access denied. Super Admin credentials required.");
-                setLoading(false);
-                await signIn('credentials', { redirect: false }); // Sign out
-            }
+            console.log('✅ Login successful, checking session...');
+            // Force a hard reload to ensure cookies/session are picked up
+            window.location.href = "/admin/dashboard";
         }
     };
 

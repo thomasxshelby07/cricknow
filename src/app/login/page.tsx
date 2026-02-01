@@ -31,6 +31,8 @@ export default function AdminLoginPage() {
             setError("Invalid credentials");
             setLoading(false);
         } else {
+            console.log('✅ Login successful, checking session...');
+
             // Verify user is active
             const response = await fetch('/api/auth/session');
             const session = await response.json();
@@ -41,7 +43,8 @@ export default function AdminLoginPage() {
                 return;
             }
 
-            router.push("/admin/dashboard");
+            // Force a hard reload to ensure cookies/session are picked up
+            window.location.href = "/admin/dashboard";
         }
     };
 

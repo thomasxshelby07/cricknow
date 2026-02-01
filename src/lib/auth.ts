@@ -22,8 +22,11 @@ export const authOptions: NextAuthOptions = {
                 const user = await User.findOne({ email: credentials.email });
 
                 if (!user) {
+                    console.log('❌ Login failed: No user found for', credentials.email);
                     throw new Error("No user found");
                 }
+
+                console.log('👤 Found user:', user.email, 'Role:', user.role);
 
                 const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
 
