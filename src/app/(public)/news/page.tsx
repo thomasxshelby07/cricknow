@@ -21,16 +21,21 @@ async function getNewsData(category?: string) {
     }
 
     // Fetch Featured News (Array for Slider)
+    // Fetch Featured News (Limit to top 5 for Slider)
     let featuredNews: any[] = [];
     if (!category || category === 'All') {
         featuredNews = await News.find({ ...query, isFeatured: true })
             .sort({ priority: -1, createdAt: -1 })
+            .limit(5)
             .lean();
     }
 
-    // Fetch Latest News (Exclude featured from main list)
+    // Fetch Latest News (Exclude ONLY the featured ones being shown)
     const featuredIds = featuredNews.map(n => n._id.toString());
     const newsQuery = { ...query };
+
+    // We exclude the specific IDs shown in the slider, NOT all featured items.
+    // This allows "older" featured items to spill over into the latest list if they don't make the top 5 cut.
     if (featuredIds.length > 0) {
         newsQuery._id = { $nin: featuredIds };
     }
