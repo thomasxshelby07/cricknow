@@ -33,12 +33,35 @@ export default function AdminLoginPage() {
         } else {
             console.log('✅ Login successful, checking session...');
 
-            // Verify user is active
+            // Verify user is active and has correct role
             const response = await fetch('/api/auth/session');
             const session = await response.json();
 
             if (session?.user?.isActive === false) {
                 setError("Your account has been deactivated. Please contact super admin.");
+                setLoading(false);
+                return;
+            }
+
+            // Strict Role Check: Admins/Sub-Admins only (or allow Super Admin)
+            // Ideally, Super Admin can login anywhere, but user asked for separation.
+            // If user wants STRICT separation, then:
+            /*
+            if (session?.user?.role === 'SUPER_ADMIN') {
+                 setError("Please use the Super Admin Portal.");
+                 await fetch('/api/auth/signout', { method: 'POST' }); 
+                 setLoading(false);
+                 return;
+            }
+            */
+            // For now, I will assume Super Admin can access Admin panel too, but SUB_ADMIN cannot access Super Admin panel (which I enforced above).
+            // If user wants ONLY SUB_ADMIN here, uncomment the block above.
+            // User said "admin form se login ho" -> sounds like he wants them to use the correct form.
+
+            // Checking if the user is a valid admin type
+            if (!['ADMIN', 'SUB_ADMIN', 'SUPER_ADMIN'].includes(session?.user?.role)) {
+                setError("Access Denied: Unauthorized role.");
+                await fetch('/api/auth/signout', { method: 'POST' });
                 setLoading(false);
                 return;
             }

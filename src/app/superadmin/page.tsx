@@ -32,6 +32,18 @@ export default function SuperAdminLoginPage() {
             setLoading(false);
         } else {
             console.log('✅ Login successful, checking session...');
+
+            // Verify Super Admin Role
+            const response = await fetch('/api/auth/session');
+            const session = await response.json();
+
+            if (session?.user?.role !== 'SUPER_ADMIN') {
+                setError("Access Denied: Super Admin privileges required.");
+                await fetch('/api/auth/signout', { method: 'POST' }); // Force logout
+                setLoading(false);
+                return;
+            }
+
             // Force a hard reload to ensure cookies/session are picked up
             window.location.href = "/admin/dashboard";
         }

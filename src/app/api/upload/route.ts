@@ -35,8 +35,15 @@ export async function POST(req: NextRequest) {
         const url = `/uploads/${filename}`;
 
         return NextResponse.json({ success: true, url });
-    } catch (error) {
-        console.error("Upload error:", error);
-        return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    } catch (error: any) {
+        console.error("❌ Upload API Error:", error);
+        // Log environment details for debugging
+        console.error("DEBUG INFO:", {
+            cwd: process.cwd(),
+            nodeEnv: process.env.NODE_ENV,
+            errorMessage: error?.message,
+            stack: error?.stack
+        });
+        return NextResponse.json({ error: "Upload failed: " + (error?.message || "Unknown error") }, { status: 500 });
     }
 }
