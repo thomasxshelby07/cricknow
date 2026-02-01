@@ -88,9 +88,9 @@ export default async function NewsPage({ searchParams }: { searchParams: { categ
                                 <Link
                                     key={cat}
                                     href={cat === 'All' ? '/news' : `/news?category=${cat}`}
-                                    className={`px-4 py-2 rounded-full text-sm font-bold transition-all uppercase tracking-wide ${category === cat
-                                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                                        : 'bg-gray-100 dark:bg-gray-900 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'
+                                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-wider border ${category === cat
+                                        ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white shadow-md'
+                                        : 'bg-transparent text-gray-500 border-gray-200 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
                                         }`}
                                 >
                                     {cat}

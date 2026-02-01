@@ -47,13 +47,23 @@ async function getSidebarData() {
     return { trendingNews, sidebarSites };
 }
 
-export default async function BlogsPage() {
+export default async function BlogsPage({ searchParams }: { searchParams: { category?: string } }) {
+    const category = searchParams.category || 'all';
     const featuredBlogs = await getFeaturedBlogs();
     const { trendingNews, sidebarSites } = await getSidebarData();
     const featuredIds = featuredBlogs.map((b: any) => b._id.toString());
 
+    // Category Map: Value -> Label
+    const categories = [
+        { value: 'all', label: 'All' },
+        { value: 'guides', label: 'Betting Guides' },
+        { value: 'betting', label: 'General Betting' },
+        { value: 'casino', label: 'Casino Strategy' },
+        { value: 'cricket', label: 'Cricket News' },
+    ];
+
     return (
-        <div className="bg-white dark:bg-black min-h-screen">
+        <div className="bg-white dark:bg-black min-h-screen font-sans">
             {/* Header Section (Black & White Theme) */}
             <div className="bg-black text-white py-8 md:py-12 px-4 border-b border-gray-800">
                 <div className="container mx-auto max-w-4xl text-center space-y-2">
@@ -66,8 +76,8 @@ export default async function BlogsPage() {
                 </div>
             </div>
 
-            {/* Featured Slider Section */}
-            {featuredBlogs.length > 0 && (
+            {/* Featured Slider Section (Only on All) */}
+            {featuredBlogs.length > 0 && category === 'all' && (
                 <div className="container mx-auto px-4 mt-8 mb-12">
                     <FeaturedSlider items={JSON.parse(JSON.stringify(featuredBlogs))} basePath="/blogs" />
                 </div>
@@ -78,13 +88,31 @@ export default async function BlogsPage() {
 
                     {/* Main Blog Grid */}
                     <div className="lg:col-span-8">
-                        <div className={featuredBlogs.length > 0 ? "" : "mt-8"}>
+
+                        {/* 🔹 NEW: Category Filters */}
+                        <div className="flex flex-wrap gap-3 mb-8 pb-4 border-b border-gray-100 dark:border-gray-800">
+                            {categories.map((cat) => (
+                                <Link
+                                    key={cat.value}
+                                    href={cat.value === 'all' ? '/blogs' : `/blogs?category=${cat.value}`}
+                                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-wider border ${category === cat.value
+                                            ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white shadow-md'
+                                            : 'bg-transparent text-gray-500 border-gray-200 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                                        }`}
+                                >
+                                    {cat.label}
+                                </Link>
+                            ))}
+                        </div>
+
+                        <div className={featuredBlogs.length > 0 && category === 'all' ? "" : "mt-8"}>
                             <BlogGrid
                                 count={50}
-                                title={featuredBlogs.length > 0 ? "More Articles" : "Latest Articles"}
+                                title={category === 'all' ? (featuredBlogs.length > 0 ? "More Articles" : "Latest Articles") : `${categories.find(c => c.value === category)?.label || category}`}
                                 showLink={false}
                                 showEmptyState={true}
-                                excludeIds={featuredIds}
+                                excludeIds={category === 'all' ? featuredIds : []} // Don't exclude featured if filtering by category (user expects to see them)
+                                category={category}
                             />
                         </div>
                     </div>
@@ -93,7 +121,7 @@ export default async function BlogsPage() {
                     <aside className="lg:col-span-4 space-y-8 mt-12 lg:mt-0">
 
                         {/* 1. Trending News Widget */}
-                        <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm">
+                        <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm sticky top-24">
                             <h3 className="text-lg font-black uppercase text-neutral-900 dark:text-white mb-5 flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-gray-800">
                                 <TrendingUp className="w-5 h-5 text-red-500" /> Trending News
                             </h3>
@@ -130,7 +158,7 @@ export default async function BlogsPage() {
 
                         {/* 2. Betting Sites Widget */}
                         {sidebarSites.length > 0 && (
-                            <div className="bg-gray-50 dark:bg-neutral-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm sticky top-24">
+                            <div className="bg-gray-50 dark:bg-neutral-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm mt-8">
                                 <h3 className="text-lg font-black uppercase text-neutral-900 dark:text-white mb-5 flex items-center gap-2">
                                     <Trophy className="w-5 h-5 text-yellow-500" /> Top Picks
                                 </h3>
