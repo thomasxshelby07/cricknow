@@ -41,7 +41,7 @@ async function getNewsData(category?: string) {
     }
 
     const latestNews = await News.find(newsQuery)
-        .sort({ createdAt: -1 })
+        .sort({ priority: -1, createdAt: -1 })
         .limit(20)
         .lean();
 

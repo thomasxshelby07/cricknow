@@ -32,7 +32,7 @@ async function getNews(count: number, manualIds?: string[]) {
         'visibility.status': 'published',
         'visibility.showOnHome': true // STRICT ENFORCEMENT
     })
-        .sort({ createdAt: -1 })
+        .sort({ priority: -1, createdAt: -1 })
         .limit(count)
         .lean();
 }
