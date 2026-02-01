@@ -107,13 +107,16 @@ export function MediaTab({ data, updateData }: TabProps) {
 
         try {
             const res = await fetch("/api/upload", { method: "POST", body: formData });
-            if (!res.ok) throw new Error("Upload failed");
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `Upload failed: ${res.status}`);
+            }
             const json = await res.json();
             updateData({ coverImage: json.url });
             toast.success("Image uploaded!");
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("Failed to upload image.");
+            toast.error(error.message || "Failed to upload image.");
         } finally {
             setUploading(false);
         }
@@ -187,10 +190,17 @@ export function MediaTab({ data, updateData }: TabProps) {
                                                 const formData = new FormData();
                                                 formData.append("file", e.target.files[0]);
                                                 const res = await fetch("/api/upload", { method: "POST", body: formData });
+                                                if (!res.ok) {
+                                                    const errData = await res.json().catch(() => ({}));
+                                                    throw new Error(errData.error || "Upload failed");
+                                                }
                                                 const json = await res.json();
                                                 updateData({ screenshots: [...(data.screenshots || []), json.url] });
                                                 toast.success("Screenshot uploaded");
-                                            } catch (err) { toast.error("Upload failed"); }
+                                            } catch (err: any) {
+                                                console.error(err);
+                                                toast.error(err.message || "Upload failed");
+                                            }
                                             finally { setUploading(false); }
                                         }
                                     }}

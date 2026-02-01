@@ -48,13 +48,16 @@ export function CategoryForm({ initialData, id }: CategoryFormProps) {
 
         try {
             const res = await fetch("/api/upload", { method: "POST", body: formData });
-            if (!res.ok) throw new Error("Upload failed");
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || "Upload failed");
+            }
             const json = await res.json();
             updateData({ iconUrl: json.url });
             toast.success("Icon uploaded!");
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("Failed to upload icon.");
+            toast.error(error.message || "Failed to upload icon.");
         } finally {
             setUploading(false);
         }

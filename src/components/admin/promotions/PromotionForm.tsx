@@ -91,7 +91,10 @@ export function PromotionForm({ initialData, isEditing = false }: PromotionFormP
                 body: formDataUpload,
             });
 
-            if (!res.ok) throw new Error("Upload failed");
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || "Upload failed");
+            }
 
             const json = await res.json();
             setFormData(prev => ({
@@ -102,9 +105,9 @@ export function PromotionForm({ initialData, isEditing = false }: PromotionFormP
                 }
             }));
             toast.success(`${type} image uploaded!`);
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("Failed to upload image.");
+            toast.error(error.message || "Failed to upload image.");
         } finally {
             setUploading(false);
         }

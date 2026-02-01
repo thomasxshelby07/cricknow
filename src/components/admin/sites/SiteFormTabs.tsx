@@ -550,14 +550,17 @@ export function MediaTab({ data, updateData }: TabProps) {
                 body: formData,
             });
 
-            if (!res.ok) throw new Error("Upload failed");
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `Upload failed: ${res.status}`);
+            }
 
             const json = await res.json();
             updateData({ [field]: json.url });
             toast.success("Image uploaded!");
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("Failed to upload image.");
+            toast.error(error.message || "Failed to upload image. Please retry.");
         } finally {
             setUploading(false);
         }

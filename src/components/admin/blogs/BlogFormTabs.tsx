@@ -146,13 +146,16 @@ export function MediaTab({ data, updateData }: TabProps) {
 
         try {
             const res = await fetch("/api/upload", { method: "POST", body: formData });
-            if (!res.ok) throw new Error("Upload failed");
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `Upload failed: ${res.status}`);
+            }
             const json = await res.json();
             updateData({ coverImageUrl: json.url });
             toast.success("Image uploaded!");
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("Failed to upload image.");
+            toast.error(error.message || "Failed to upload image. Please check file size (<4MB).");
         } finally {
             setUploading(false);
         }

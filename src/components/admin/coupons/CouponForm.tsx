@@ -52,12 +52,16 @@ export function CouponForm({ initialData, isEdit = false }: CouponFormProps) {
                 body: formData,
             });
 
-            if (!res.ok) throw new Error("Upload failed");
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `Upload failed with status ${res.status}`);
+            }
 
             const data = await res.json();
             setImagePreview(data.url);
-        } catch (error) {
-            toast.error("Failed to upload image");
+        } catch (error: any) {
+            console.error("Upload failed details:", error);
+            toast.error(error.message || "Failed to upload image. Please check file size (<4MB).");
         }
     };
 
