@@ -7,11 +7,13 @@ import { User } from '../src/models/User';
 async function seed() {
     await connectToDatabase();
 
-    const email = process.env.SUPER_ADMIN_EMAIL || 'admin@cricknow.com';
-    const password = process.env.SUPER_ADMIN_PASSWORD || 'adminpassword123';
+    const email = process.env.SUPER_ADMIN_EMAIL;
+    const password = process.env.SUPER_ADMIN_PASSWORD;
 
-    if (!process.env.SUPER_ADMIN_EMAIL || !process.env.SUPER_ADMIN_PASSWORD) {
-        console.warn('⚠️  Warning: Using default credentials. Set SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD in .env');
+    if (!email || !password) {
+        console.error('❌ Error: SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD must be set in .env file');
+        console.error('Please add these variables to your .env file and try again.');
+        process.exit(1);
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
