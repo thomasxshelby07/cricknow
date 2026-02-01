@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import connectToDatabase from "@/lib/db";
 import { News } from "@/models/News";
+import "@/models/BettingSite";
+import "@/models/Blog";
+import "@/models/Coupon";
 
 export const dynamic = 'force-dynamic';
 

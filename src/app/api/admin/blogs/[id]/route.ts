@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import connectToDatabase from "@/lib/db";
 import { Blog } from "@/models/Blog";
+import "@/models/BettingSite";
+import "@/models/News";
+import "@/models/Coupon";
 import { slugify } from "@/lib/utils";
 
 export async function GET(
