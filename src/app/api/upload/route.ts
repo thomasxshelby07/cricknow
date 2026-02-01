@@ -37,10 +37,7 @@ export async function POST(req: NextRequest) {
             console.log("☁️ Attempting Cloudinary Upload...");
 
             if (!hasCloudinarySecret) {
-                console.error("❌ MISSING CLOUDINARY_API_SECRET. Upload will likely fail.");
-                return NextResponse.json({
-                    error: "Server Configuration Error: Missing Cloudinary API Secret. Please add CLOUDINARY_API_SECRET to environment variables."
-                }, { status: 500 });
+                console.warn("⚠️ CLOUDINARY_API_SECRET not found in environment variables. Attempting to use fallback configuration from lib/cloudinary...");
             }
 
             // Upload via Stream
