@@ -68,7 +68,7 @@ export default function SuperAdminLoginPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="bg-gray-800 border-gray-700 text-white"
-                                placeholder="admin@cricknow.com"
+                                placeholder="your.email@example.com"
                             />
                         </div>
                         <div className="space-y-2">

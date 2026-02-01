@@ -17,8 +17,16 @@ export async function POST(request: NextRequest) {
 
         await connectToDatabase();
 
-        const email = 'admin@cricknow.com';
-        const password = 'adminpassword123';
+        // Get credentials from environment variables
+        const email = process.env.SUPER_ADMIN_EMAIL;
+        const password = process.env.SUPER_ADMIN_PASSWORD;
+
+        if (!email || !password) {
+            return NextResponse.json(
+                { error: 'Super admin credentials not configured in environment variables' },
+                { status: 500 }
+            );
+        }
 
         // Check if super admin already exists
         const existing = await User.findOne({ email });
